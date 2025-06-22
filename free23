@@ -1,0 +1,102 @@
+if not rconsoleprint or not rconsoleinput then
+    error("rconsole is not supported by your executor.")
+end
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local username = player.Name
+
+-- Таблица заблокированных пользователей
+local bannedUsers = {
+    ["null"] = true,
+    ["BadUser456"] = true,
+    -- Добавляй сюда другие ники
+}
+
+-- Таблица допустимых ключей по никам
+local allowedKeys = {
+    ["wexcoreofficial"] = {key = "1337", days = 1000},
+    ["Сorte9x"] = {key = "001", days = 3},
+    [""] = {key = "", days = 7},
+    [""] = {key = "", days = 7},
+    [""] = {key = "", days = 7},
+    [""] = {key = "", days = 7},
+}
+
+-- Функция зелёного текста
+local function printGreen(text)
+    rconsoleprint("\27[32m" .. text .. "\27[0m")
+end
+
+-- Проверка на бан
+if bannedUsers[username] then
+    rconsoleclear()
+    rconsoleprint("You are banned from using this script.")
+    return
+end
+
+-- Функция запуска чит-клиента
+local function inject(userData, isFree)
+    rconsoleclear()
+    if isFree then
+        rconsoleprint("Injecting free version in 3 seconds...\n")
+    else
+        rconsoleprint("Your key is valid, starting injection in 3 seconds...\n")
+        rconsoleprint("Days left: " .. userData.days .. "\n")
+    end
+    wait(3)
+
+    local scriptUrl
+    if isFree then
+        scriptUrl = "https://raw.githubusercontent.com/wizzardd1337/free/refs/heads/main/free"
+    else
+        scriptUrl = "https://raw.githubusercontent.com/wizzardd1337/adminguii/refs/heads/main/admingui"
+    end
+
+    local success, err = pcall(function()
+        loadstring(game:HttpGet(scriptUrl))()
+    end)
+
+    rconsoleclear()
+    if success then
+        printGreen("Successfully Injected, Happy Cheating!\n")
+    else
+        rconsoleprint("\27[31mScript injection failed: " .. err .. "\27[0m\n")
+    end
+end
+
+-- Основная проверка ключа
+local function requestKey()
+    while true do
+        rconsoleclear()
+        rconsoleprint("Wexcore\n")
+        rconsoleprint("Press 1 for paid version\n")
+        rconsoleprint("Press 2 for free version\n")
+        local mode = rconsoleinput()
+
+        if mode == "2" then
+            inject({days = 7}, true)
+            break
+        elseif mode == "1" then
+            rconsoleclear()
+            rconsoleprint("Wexcore\n")
+            rconsoleprint("Enter your key: ")
+            local inputKey = rconsoleinput()
+            local userData = allowedKeys[username]
+
+            if userData and inputKey == userData.key then
+                inject(userData, false)
+                break
+            else
+                rconsoleprint("\n\27[31mInvalid key or you are not allowed to use this key.\27[0m\n")
+                wait(2)
+            end
+        else
+            rconsoleprint("\n\27[31mInvalid option. Please choose 1 or 2.\27[0m\n")
+            wait(2)
+        end
+    end
+end
+
+-- Запуск
+requestKey()
